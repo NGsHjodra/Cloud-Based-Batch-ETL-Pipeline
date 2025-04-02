@@ -16,8 +16,8 @@ def gcs_to_bigquery(cloud_event):
     client = bigquery.Client()
 
     # Set dataset and table info
-    dataset_id = "your_dataset"
-    table_id = "your_table"
+    dataset_id = "university_taiwan"
+    table_id = "harbour_space_schedule"
     uri = f"gs://{bucket_name}/{file_name}"
 
     # Load job config
