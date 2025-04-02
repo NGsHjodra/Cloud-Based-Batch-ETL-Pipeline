@@ -32,13 +32,21 @@ def main(request):
     if response.status_code != 200:
         return (json.dumps({"error": f"Failed to fetch schedule: {response.status_code}"}), 500, {'Content-Type': 'application/json'})
 
-    json_data = response.text
-
     # Save data to /tmp
     file_name = "harbour_space_schedule.json"
     file_path = f"/tmp/{file_name}"
+
+    json_data = response.json()
+
+    # If it's wrapped in a dict with a "data" key, unwrap it
+    if isinstance(json_data, dict) and "data" in json_data:
+        json_data = json_data["data"]
+
+    # Write as NDJSON
     with open(file_path, "w", encoding="utf-8") as f:
-        f.write(json_data)
+        for item in json_data:
+            f.write(json.dumps(item) + "\n")
+
 
     uploaded_path = None
     if project_id and bucket_name:
