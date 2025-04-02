@@ -1,0 +1,42 @@
+steps:
+  # Build EL container
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/EL', './EL']
+
+  # Push EL container
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/EL']
+
+  # Deploy EL to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args: [
+      'run', 'deploy', 'EL',
+      '--image', 'gcr.io/$PROJECT_ID/EL',
+      '--platform', 'managed',
+      '--region', 'us-central1',
+      '--allow-unauthenticated'
+    ]
+
+  # Build TL container
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/TL', './TL']
+
+  # Push TL container
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/TL']
+
+  # Deploy TL to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args: [
+      'run', 'deploy', 'TL',
+      '--image', 'gcr.io/$PROJECT_ID/TL',
+      '--platform', 'managed',
+      '--region', 'us-central1',
+      '--no-allow-unauthenticated'  # Usually triggered by GCS not users
+    ]
+
+images:
+  - 'gcr.io/$PROJECT_ID/EL'
+  - 'gcr.io/$PROJECT_ID/TL'
