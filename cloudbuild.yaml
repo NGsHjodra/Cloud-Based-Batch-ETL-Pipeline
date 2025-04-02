@@ -1,42 +1,42 @@
 steps:
-  # Build EL container
+  # Build EL container (Extract and Load)
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/EL', './EL']
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/extract-to-gcs', './EL']
 
   # Push EL container
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/EL']
+    args: ['push', 'gcr.io/$PROJECT_ID/extract-to-gcs']
 
   # Deploy EL to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args: [
-      'run', 'deploy', 'EL',
-      '--image', 'gcr.io/$PROJECT_ID/EL',
-      '--platform', 'managed',
+      'run', 'deploy', 'extract-to-gcs',
+      '--image', 'gcr.io/$PROJECT_ID/extract-to-gcs',
       '--region', 'us-central1',
+      '--platform', 'managed',
       '--allow-unauthenticated'
     ]
 
-  # Build TL container
+  # Build TL container (Transform and Load)
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/TL', './TL']
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/gcs-to-bigquery', './TL']
 
   # Push TL container
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/TL']
+    args: ['push', 'gcr.io/$PROJECT_ID/gcs-to-bigquery']
 
   # Deploy TL to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args: [
-      'run', 'deploy', 'TL',
-      '--image', 'gcr.io/$PROJECT_ID/TL',
-      '--platform', 'managed',
+      'run', 'deploy', 'gcs-to-bigquery',
+      '--image', 'gcr.io/$PROJECT_ID/gcs-to-bigquery',
       '--region', 'us-central1',
-      '--no-allow-unauthenticated'  # Usually triggered by GCS not users
+      '--platform', 'managed',
+      '--no-allow-unauthenticated'
     ]
 
 images:
-  - 'gcr.io/$PROJECT_ID/EL'
-  - 'gcr.io/$PROJECT_ID/TL'
+  - 'gcr.io/$PROJECT_ID/extract-to-gcs'
+  - 'gcr.io/$PROJECT_ID/gcs-to-bigquery'
