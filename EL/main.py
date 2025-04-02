@@ -37,8 +37,15 @@ def main(request):
     # Save data to /tmp
     file_name = "harbour_space_schedule.json"
     file_path = f"/tmp/{file_name}"
+    
+    # If it's an object with a key like "data" or "results", access it
+    if isinstance(json_data, dict) and "data" in json_data:
+        json_data = json_data["data"]
+
+    # Write each item on a new line
     with open(file_path, "w", encoding="utf-8") as f:
-        f.write(json_data)
+        for item in json_data:
+            f.write(json.dumps(item) + "\n")
 
     uploaded_path = None
     if project_id and bucket_name:
