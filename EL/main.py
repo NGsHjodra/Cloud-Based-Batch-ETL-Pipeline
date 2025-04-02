@@ -3,6 +3,9 @@ import json
 import requests
 import functions_framework
 from google.cloud import storage
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 @functions_framework.http
 def main(request):
@@ -13,9 +16,14 @@ def main(request):
         }), 200, {'Content-Type': 'application/json'})
 
     data = request.get_json(silent=True) or {}
+
+    logging.info(f"Request received: {data}")
+
     project_id = data.get("project_id")
     bucket_name = data.get("bucket_name")
     destination_folder = data.get("destination_folder", "harbour_space_data")
+
+    logging.info(f"Uploading to bucket: {bucket_name} under project: {project_id}")
 
     # Request the Harbour.Space schedule data
     url = "https://harbour.space/api/v1/schedule?include=course&first_year=2024&campus=barcelona"
